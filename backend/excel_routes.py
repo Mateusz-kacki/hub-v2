@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import pandas as pd
-from parsers import parse_lp2
+from parsers import parse_lp1, parse_lp2
 
 router = APIRouter()
 
@@ -14,14 +14,14 @@ async def upload_lp1(file: UploadFile = File(...)):
         "columns": list(df.columns)
     }
 
-@router.post("/upload/lp2")
-async def upload_lp2(file: UploadFile = File(...)):
+@router.post("/upload/lp1")
+async def upload_lp1(file: UploadFile = File(...)):
     df = pd.read_excel(file.file)
-    stores = parse_lp2(df)
+    arrivals = parse_lp1(df)
 
     return {
         "filename": file.filename,
         "rows": len(df),
-        "stores_count": len(stores),
-        "stores": stores[:10]
+        "arrivals_count": len(arrivals),
+        "arrivals": arrivals[:10]
     }
