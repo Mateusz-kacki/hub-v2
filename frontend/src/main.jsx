@@ -3,8 +3,11 @@ import ReactDOM from "react-dom/client";
 
 function App() {
   const [grids, setGrids] = useState([]);
+
   const [lp1File, setLp1File] = useState(null);
   const [lp2File, setLp2File] = useState(null);
+
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     loadLayout();
@@ -13,7 +16,39 @@ function App() {
   async function loadLayout() {
     const response = await fetch("http://127.0.0.1:8000/layout");
     const data = await response.json();
+
     setGrids(data.grids || []);
+  }
+
+  async function uploadDay() {
+    if (!lp1File || !lp2File) {
+      alert("Wybierz LP1 i LP2");
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("lp1", lp1File);
+    formData.append("lp2", lp2File);
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/upload/day",
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+      const data = await response.json();
+
+      setTasks(data.tasks || []);
+
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+      alert("Błąd uploadu");
+    }
   }
 
   return (
@@ -38,6 +73,10 @@ function App() {
             onChange={(e) => setLp2File(e.target.files[0])}
           />
         </label>
+
+        <button onClick={uploadDay}>
+          Przelicz plan
+        </button>
       </div>
 
       <div style={styles.canvas}>
@@ -54,7 +93,9 @@ function App() {
               gridTemplateColumns: `repeat(${grid.columns}, 1fr)`
             }}
           >
-            {Array.from({ length: grid.rows * grid.columns }).map((_, index) => (
+            {Array.from({
+              length: grid.rows * grid.columns
+            }).map((_, index) => (
               <div key={index} style={styles.cell}></div>
             ))}
           </div>
