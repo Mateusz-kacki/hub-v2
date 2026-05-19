@@ -32,13 +32,10 @@ function App() {
     formData.append("lp2", lp2File);
 
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/upload/day",
-        {
-          method: "POST",
-          body: formData
-        }
-      );
+      const response = await fetch("http://127.0.0.1:8000/upload/day", {
+        method: "POST",
+        body: formData
+      });
 
       const data = await response.json();
 
@@ -49,6 +46,14 @@ function App() {
       console.error(error);
       alert("Błąd uploadu");
     }
+  }
+
+  function getTaskForRow(gridId, rowIndex) {
+    return tasks.find(
+      (task) =>
+        task.assigned_grid_id === gridId &&
+        task.assigned_row === rowIndex
+    );
   }
 
   return (
@@ -95,9 +100,36 @@ function App() {
           >
             {Array.from({
               length: grid.rows * grid.columns
-            }).map((_, index) => (
-              <div key={index} style={styles.cell}></div>
-            ))}
+            }).map((_, index) => {
+              const rowIndex = Math.floor(index / grid.columns);
+              const colIndex = index % grid.columns;
+
+              const task = getTaskForRow(grid.id, rowIndex);
+
+              const isTextColumn = colIndex === grid.columns - 1;
+
+              let background = "#facc15";
+
+              if (task && !isTextColumn) {
+                if (colIndex >= grid.columns - 1 - task.black_quantity) {
+                  background = "#111827";
+                } else if (colIndex >= grid.columns - 1 - task.total_quantity) {
+                  background = "#4aa3ff";
+                }
+              }
+
+              return (
+                <div
+                  key={index}
+                  style={{
+                    ...styles.cell,
+                    background
+                  }}
+                >
+                  {task && isTextColumn ? task.store_number : ""}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
@@ -143,7 +175,13 @@ const styles = {
 
   cell: {
     border: "1px solid #9ca3af",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
+    fontSize: "11px",
+    fontWeight: "bold",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden"
   }
 };
 
