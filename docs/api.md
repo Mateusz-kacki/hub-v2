@@ -100,3 +100,25 @@ System:
     }
   ]
 }
+## GET /layout
+
+### Description
+Zwraca layout magazynu, czyli listę gridów z przypisaniem do doków i pozycją na planie.
+
+### Response
+
+```json
+{
+  "grids": [
+    {
+      "id": "dock16-left",
+      "dock": 16,
+      "x": 10,
+      "y": 20,
+      "width": 12,
+      "height": 25,
+      "rows": 8,
+      "columns": 8
+    }
+  ]
+}
