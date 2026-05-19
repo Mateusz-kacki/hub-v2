@@ -1,3 +1,6 @@
+from layout import GRIDS
+
+
 def merge_lp1_lp2(arrivals, departures):
     arrivals_by_store = {
         item["store_number"]: item
@@ -10,24 +13,47 @@ def merge_lp1_lp2(arrivals, departures):
         store = dep["store_number"]
         arrival = arrivals_by_store.get(store)
 
-        tasks.append({
+        total_quantity = dep["total_quantity"]
+        black_quantity = dep["black_quantity"]
+
+        task = {
             "store_number": store,
+
             "arrival_time": arrival["arrival_time"] if arrival else None,
             "departure_time": dep["departure_time"],
+
             "lp": dep["lp"],
-            "total_quantity": dep["total_quantity"],
-            "black_quantity": dep["black_quantity"],
-            "blue_quantity": max(0, dep["total_quantity"] - dep["black_quantity"]),
+
+            "total_quantity": total_quantity,
+            "black_quantity": black_quantity,
+            "blue_quantity": max(0, total_quantity - black_quantity),
+
             "notes": dep["notes"],
+
             "assigned_dock": None,
             "assigned_grid_id": None,
             "assigned_row": None,
-            "status": "waiting"
-        })
+
+            "status": determine_status(
+                arrival["arrival_time"] if arrival else None,
+                dep["departure_time"]
+            )
+        }
+
+        tasks.append(task)
 
     tasks = assign_docks(tasks)
     tasks = assign_grids(tasks)
+
     return tasks
+
+
+def determine_status(arrival_time, departure_time):
+    if not arrival_time:
+        return "waiting"
+
+    return "assigned"
+
 
 def assign_docks(tasks):
     docks = [16, 17, 18]
@@ -67,19 +93,13 @@ def assign_docks(tasks):
 
 
 def assign_grids(tasks):
-    grids = [
-        {"id": "dock16-A", "dock": 16, "rows": 8},
-        {"id": "dock17-A", "dock": 17, "rows": 8},
-        {"id": "dock18-A", "dock": 18, "rows": 8},
-    ]
-
     used_rows = {}
 
     for task in tasks:
         dock = task["assigned_dock"]
 
         available_grids = [
-            grid for grid in grids
+            grid for grid in GRIDS
             if grid["dock"] == dock
         ]
 
@@ -92,6 +112,7 @@ def assign_grids(tasks):
             if used_rows[key] < grid["rows"]:
                 task["assigned_grid_id"] = grid["id"]
                 task["assigned_row"] = used_rows[key]
+
                 used_rows[key] += 1
                 break
 
