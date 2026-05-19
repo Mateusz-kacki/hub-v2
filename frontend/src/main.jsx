@@ -173,15 +173,18 @@ const styles = {
     boxSizing: "border-box"
   },
 
-  cell: {
-    border: "1px solid #9ca3af",
-    boxSizing: "border-box",
-    fontSize: "11px",
-    fontWeight: "bold",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden"
+ cell: {
+  border: "1px solid #9ca3af",
+  boxSizing: "border-box",
+
+  fontSize: "11px",
+  fontWeight: "bold",
+
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+
+  overflow: "hidden"
   }
 };
 
