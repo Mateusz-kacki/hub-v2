@@ -3,24 +3,42 @@ import ReactDOM from "react-dom/client";
 
 function App() {
   const [grids, setGrids] = useState([]);
+  const [lp1File, setLp1File] = useState(null);
+  const [lp2File, setLp2File] = useState(null);
 
   useEffect(() => {
     loadLayout();
   }, []);
 
   async function loadLayout() {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/layout");
-      const data = await response.json();
-      setGrids(data.grids || []);
-    } catch (error) {
-      console.error("Błąd pobierania layoutu:", error);
-    }
+    const response = await fetch("http://127.0.0.1:8000/layout");
+    const data = await response.json();
+    setGrids(data.grids || []);
   }
 
   return (
     <div style={styles.app}>
-      <div style={styles.header}>Warehouse Planner</div>
+      <div style={styles.header}>
+        <strong>Warehouse Planner</strong>
+
+        <label>
+          LP1:
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={(e) => setLp1File(e.target.files[0])}
+          />
+        </label>
+
+        <label>
+          LP2:
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={(e) => setLp2File(e.target.files[0])}
+          />
+        </label>
+      </div>
 
       <div style={styles.canvas}>
         {grids.map((grid) => (
@@ -61,9 +79,9 @@ const styles = {
     color: "white",
     display: "flex",
     alignItems: "center",
-    paddingLeft: "20px",
-    fontSize: "22px",
-    fontWeight: "bold"
+    gap: "12px",
+    padding: "0 16px",
+    fontSize: "16px"
   },
 
   canvas: {
