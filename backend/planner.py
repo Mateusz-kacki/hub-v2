@@ -25,4 +25,25 @@ def merge_lp1_lp2(arrivals, departures):
             "status": "waiting"
         })
 
-    return tasks
+    return assign_docks(tasks)
+
+
+def assign_docks(tasks):
+    dock_load = {
+        16: 0,
+        17: 0,
+        18: 0
+    }
+
+    sorted_tasks = sorted(
+        tasks,
+        key=lambda x: str(x.get("departure_time") or "")
+    )
+
+    for task in sorted_tasks:
+        best_dock = min(dock_load, key=dock_load.get)
+
+        task["assigned_dock"] = best_dock
+        dock_load[best_dock] += task.get("total_quantity", 0)
+
+    return sorted_tasks
