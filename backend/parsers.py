@@ -20,3 +20,18 @@ def parse_lp2(df):
 
 def is_nan(value):
     return value != value
+
+def parse_lp1(df):
+    arrivals = []
+
+    for _, row in df.iterrows():
+        store = str(row.iloc[2]).strip() if len(row) > 2 else ""
+        if not store or store == "nan":
+            continue
+
+        arrivals.append({
+            "arrival_time": str(row.iloc[1]) if len(row) > 1 else None,
+            "store_number": store
+        })
+
+    return arrivals
