@@ -12,7 +12,6 @@ function App() {
     try {
       const response = await fetch("http://127.0.0.1:8000/layout");
       const data = await response.json();
-
       setGrids(data.grids || []);
     } catch (error) {
       console.error("Błąd pobierania layoutu:", error);
@@ -21,9 +20,7 @@ function App() {
 
   return (
     <div style={styles.app}>
-      <div style={styles.header}>
-        Warehouse Planner
-      </div>
+      <div style={styles.header}>Warehouse Planner</div>
 
       <div style={styles.canvas}>
         {grids.map((grid) => (
@@ -31,17 +28,17 @@ function App() {
             key={grid.id}
             style={{
               ...styles.grid,
-
               left: `${grid.x}%`,
               top: `${grid.y}%`,
-
               width: `${grid.width}%`,
-              height: `${grid.height}%`
+              height: `${grid.height}%`,
+              gridTemplateRows: `repeat(${grid.rows}, 1fr)`,
+              gridTemplateColumns: `repeat(${grid.columns}, 1fr)`
             }}
           >
-            <div style={styles.gridTitle}>
-              {grid.id}
-            </div>
+            {Array.from({ length: grid.rows * grid.columns }).map((_, index) => (
+              <div key={index} style={styles.cell}></div>
+            ))}
           </div>
         ))}
       </div>
@@ -79,15 +76,15 @@ const styles = {
 
   grid: {
     position: "absolute",
+    display: "grid",
     background: "#facc15",
     border: "2px solid #111827",
     boxSizing: "border-box"
   },
 
-  gridTitle: {
-    padding: "4px",
-    fontSize: "12px",
-    fontWeight: "bold"
+  cell: {
+    border: "1px solid #9ca3af",
+    boxSizing: "border-box"
   }
 };
 
