@@ -55,6 +55,11 @@ function App() {
         task.assigned_row === rowIndex
     );
   }
+  function getDockCount(dockNumber) {
+  return tasks.filter(
+    (task) => task.assigned_dock === dockNumber
+  ).length;
+}
 
   return (
     <div style={styles.app}>
@@ -82,6 +87,9 @@ function App() {
         <button onClick={uploadDay}>
           Przelicz plan
         </button>
+        <span>
+  Sklepy: {tasks.length}
+</span>
 
         <div style={styles.legend}>
           <div style={styles.legendItem}>
@@ -100,9 +108,21 @@ function App() {
           </div>
         </div>
       </div>
+      <div style={styles.dockStats}>
+  <div>DOK 16 → {getDockCount(16)}</div>
+  <div>DOK 17 → {getDockCount(17)}</div>
+  <div>DOK 18 → {getDockCount(18)}</div>
+</div>
 
       <div style={styles.canvas}>
-        {grids.map((grid) => (
+        {grids
+  .filter((grid) =>
+    tasks.some(
+      (task) =>
+        task.assigned_grid_id === grid.id
+    )
+  )
+  .map((grid) => (
           <div
             key={grid.id}
             style={{
@@ -114,7 +134,10 @@ function App() {
               gridTemplateRows: `repeat(${grid.rows}, 1fr)`,
               gridTemplateColumns: `repeat(${grid.columns}, 1fr)`
             }}
-          >
+          > 
+            <div style={styles.dockLabel}>
+  DOK {grid.dock}
+</div>
             {Array.from({
               length: grid.rows * grid.columns
             }).map((_, index) => {
@@ -126,6 +149,8 @@ function App() {
               const isTextColumn = colIndex === grid.columns - 1;
 
               let background = "#facc15";
+            if (colIndex === 0) {
+  background = "#d1d5db";
 
               if (task && !isTextColumn) {
                 if (colIndex >= grid.columns - 1 - task.black_quantity) {
@@ -143,7 +168,23 @@ function App() {
                     background
                   }}
                 >
-                  {task && isTextColumn ? task.store_number : ""}
+                  <>
+  {colIndex === 0 ? rowIndex + 1 : ""}
+
+{task && isTextColumn
+ ? (
+  <div style={styles.storeInfo}>
+    <div>{task.store_number}</div>
+
+    <div style={styles.timeRow}>
+      {task.arrival_time || "-"}
+      {" → "}
+      {task.departure_time || "-"}
+    </div>
+  </div>
+)
+  : ""}
+</>
                 </div>
               );
             })}
@@ -193,6 +234,13 @@ const styles = {
     height: "16px",
     border: "1px solid white"
   },
+  dockStats: {
+  display: "flex",
+  gap: "12px",
+  marginLeft: "20px",
+  fontSize: "13px",
+  fontWeight: "bold"
+},
 
   canvas: {
     position: "relative",
@@ -209,6 +257,26 @@ const styles = {
     border: "2px solid #111827",
     boxSizing: "border-box"
   },
+  dockLabel: {
+  position: "absolute",
+  top: "-22px",
+  left: "0",
+  fontSize: "13px",
+  fontWeight: "bold",
+  color: "#111827"
+},
+  storeInfo: {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  lineHeight: "1.1"
+},
+
+timeRow: {
+  fontSize: "9px",
+  fontWeight: "normal"
+},
 
   cell: {
     border: "1px solid #9ca3af",
