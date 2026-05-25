@@ -82,6 +82,23 @@ function App() {
         <button onClick={uploadDay}>
           Przelicz plan
         </button>
+
+        <div style={styles.legend}>
+          <div style={styles.legendItem}>
+            <div style={{ ...styles.legendColor, background: "#4aa3ff" }} />
+            Standard
+          </div>
+
+          <div style={styles.legendItem}>
+            <div style={{ ...styles.legendColor, background: "#111827" }} />
+            Dolly / Black
+          </div>
+
+          <div style={styles.legendItem}>
+            <div style={{ ...styles.legendColor, background: "#facc15" }} />
+            Wolne
+          </div>
+        </div>
       </div>
 
       <div style={styles.canvas}>
@@ -157,6 +174,26 @@ const styles = {
     fontSize: "16px"
   },
 
+  legend: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    marginLeft: "20px"
+  },
+
+  legendItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    fontSize: "13px"
+  },
+
+  legendColor: {
+    width: "16px",
+    height: "16px",
+    border: "1px solid white"
+  },
+
   canvas: {
     position: "relative",
     width: "100%",
@@ -173,18 +210,15 @@ const styles = {
     boxSizing: "border-box"
   },
 
- cell: {
-  border: "1px solid #9ca3af",
-  boxSizing: "border-box",
-
-  fontSize: "11px",
-  fontWeight: "bold",
-
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-
-  overflow: "hidden"
+  cell: {
+    border: "1px solid #9ca3af",
+    boxSizing: "border-box",
+    fontSize: "11px",
+    fontWeight: "bold",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden"
   }
 };
 
