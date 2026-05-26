@@ -1,4 +1,4 @@
-from layout import GRIDS
+from layout import AISLES, DOCK_PRIORITY
 
 
 def merge_lp1_lp2(arrivals, departures):
@@ -31,7 +31,7 @@ def merge_lp1_lp2(arrivals, departures):
             "notes": dep["notes"],
 
             "assigned_dock": None,
-            "assigned_grid_id": None,
+            "assigned_aisle_id": None,
             "assigned_row": None,
 
             "status": determine_status(
@@ -42,8 +42,7 @@ def merge_lp1_lp2(arrivals, departures):
 
         tasks.append(task)
 
-    tasks = assign_docks(tasks)
-    tasks = assign_grids(tasks)
+    tasks = assign_docks_and_aisles(tasks)
 
     return tasks
 
@@ -55,14 +54,15 @@ def determine_status(arrival_time, departure_time):
     return "assigned"
 
 
-def assign_docks(tasks):
-    docks = [16, 17, 18]
+def assign_docks_and_aisles(tasks):
+    aisle_usage = {}
 
-    dock_schedule = {
-        16: [],
-        17: [],
-        18: []
-    }
+    for aisle in AISLES:
+        aisle_usage[aisle["id"]] = {
+            "stores": 0,
+            "rows": [False, False],
+            "used_units": [0, 0]
+        }
 
     sorted_tasks = sorted(
         tasks,
@@ -70,50 +70,46 @@ def assign_docks(tasks):
     )
 
     for task in sorted_tasks:
-        departure = str(task.get("departure_time") or "")
+        assigned = False
 
-        best_dock = None
-        best_score = None
-
-        for dock in docks:
-            same_time_count = dock_schedule[dock].count(departure)
-            total_load = len(dock_schedule[dock])
-
-            score = same_time_count * 10 + total_load
-
-            if best_score is None or score < best_score:
-                best_score = score
-                best_dock = dock
-
-        task["assigned_dock"] = best_dock
-
-        dock_schedule[best_dock].append(departure)
-
-    return sorted_tasks
-
-
-def assign_grids(tasks):
-    used_rows = {}
-
-    for task in tasks:
-        dock = task["assigned_dock"]
-
-        available_grids = [
-            grid for grid in GRIDS
-            if grid["dock"] == dock
-        ]
-
-        for grid in available_grids:
-            key = grid["id"]
-
-            if key not in used_rows:
-                used_rows[key] = 0
-
-            if used_rows[key] < grid["rows"]:
-                task["assigned_grid_id"] = grid["id"]
-                task["assigned_row"] = used_rows[key]
-
-                used_rows[key] += 1
+        for dock in DOCK_PRIORITY:
+            if assigned:
                 break
 
-    return tasks
+            possible_aisles = [
+                aisle for aisle in AISLES
+                if dock in aisle["docks"]
+            ]
+
+            possible_aisles.sort(
+                key=lambda aisle: aisle.get("priority", 999)
+            )
+
+            for aisle in possible_aisles:
+                usage = aisle_usage[aisle["id"]]
+
+                if usage["stores"] >= aisle["maxStores"]:
+                    continue
+
+                quantity = task.get("total_quantity", 0)
+
+                if quantity > aisle["capacityUnits"]:
+                    continue
+
+                for row_index in range(aisle["maxStores"]):
+                    if not usage["rows"][row_index]:
+                        usage["rows"][row_index] = True
+                        usage["used_units"][row_index] = quantity
+                        usage["stores"] += 1
+
+                        task["assigned_dock"] = dock
+                        task["assigned_aisle_id"] = aisle["id"]
+                        task["assigned_row"] = row_index
+
+                        assigned = True
+                        break
+
+                if assigned:
+                    break
+
+    return sorted_tasks
