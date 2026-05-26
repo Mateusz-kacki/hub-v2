@@ -195,10 +195,6 @@ Backend:
 
 # Autor
 
-Warehouse Planner MVP
-2026
+Mateusz.K
 
-# Autor
 
-Warehouse Planner MVP
-2026
