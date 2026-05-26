@@ -27,7 +27,6 @@ Dok załadunkowy.
 Pola:
 - dockNumber
 - name
-- position
 - priority
 
 Przykład:
@@ -47,7 +46,7 @@ Planner obsługuje:
 
 DOK 15:
 - inbound only
-- nie bierze udziału w dystrybucji
+- ignorowany przez planner dystrybucji
 
 Priorytet doków:
 
@@ -61,15 +60,18 @@ Priorytet doków:
 
 Alejka magazynowa.
 
-Zastępuje wcześniejszy model:
-```text
-Grid
-```
-
 Alejka:
 - może obsługiwać wiele doków,
 - posiada limit pojemności,
-- posiada limit sklepów.
+- posiada limit sklepów,
+- renderowana jest jako układ 2x16.
+
+Struktura renderu:
+
+```text
+| ID ALEJKI | 16 jednostek | sklep |
+| ID ALEJKI | 16 jednostek | sklep |
+```
 
 Pola:
 - id
@@ -106,12 +108,22 @@ Przykład:
 
 ---
 
-# Zasady alejek
+# Capacity Rules
 
-Każda alejka:
-- posiada maksymalną pojemność,
-- posiada limit sklepów,
-- może być współdzielona między dokami.
+Jedna alejka:
+- maksymalnie 16 jednostek na rząd,
+- maksymalnie 2 sklepy,
+- jeden sklep zajmuje jeden rząd.
+
+Planner pilnuje:
+- capacityUnits,
+- maxStores.
+
+---
+
+# Shared Aisles
+
+Niektóre alejki mogą być współdzielone między dokami.
 
 Przykład:
 
@@ -137,6 +149,7 @@ Pola:
 - blueQuantity
 - assignedDock
 - assignedAisleId
+- assignedRow
 - status
 
 Przykład:
@@ -155,7 +168,10 @@ Przykład:
   "blueQuantity": 8,
 
   "assignedDock": 16,
+
   "assignedAisleId": "S16-8",
+
+  "assignedRow": 0,
 
   "status": "assigned"
 }
@@ -195,8 +211,8 @@ Frontend renderuje:
 - statusy,
 - obciążenie doków.
 
-Layout bazuje na:
-- współrzędnych x/y,
-- szerokości,
-- wysokości,
-- przypisanych dokach.
+Każda alejka renderowana jest jako:
+- 2 rzędy,
+- 16 jednostek,
+- kolumna ID alejki,
+- kolumna sklepu.
