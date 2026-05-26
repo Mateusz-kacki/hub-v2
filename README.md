@@ -76,12 +76,24 @@ Magazyn składa się z:
 - sektorów,
 - doków dystrybucyjnych.
 
+Planner korzysta wyłącznie z:
+- podłużnych żółtych alejek magazynowych.
+
 Alejka:
 - może obsługiwać wiele doków,
 - posiada limit pojemności,
-- posiada limit sklepów.
+- posiada limit sklepów,
+- posiada maksymalnie 2 sklepy,
+- każdy sklep może zajmować maksymalnie 16 jednostek.
 
-Przykład:
+Przykład wizualny:
+
+```text
+| S16-8 | [########....] | sklep 1 |
+| S16-8 | [######......] | sklep 2 |
+```
+
+Przykład modelu:
 
 ```python
 {
@@ -89,8 +101,9 @@ Przykład:
 
   "docks": [16, 17],
 
-  "capacity_units": 16,
-  "max_stores": 2
+  "capacityUnits": 16,
+
+  "maxStores": 2
 }
 ```
 
@@ -105,6 +118,12 @@ Planner:
 - pilnuje liczby sklepów,
 - obsługuje współdzielone alejki,
 - dynamicznie przydziela sklepy.
+
+Planner pilnuje:
+- maksymalnie 2 sklepów na alejkę,
+- maksymalnie 16 jednostek na sklep,
+- poprawnego przypisania doków,
+- priorytetów doków 16 → 17 → 18.
 
 ---
 
@@ -196,5 +215,3 @@ Backend:
 # Autor
 
 Mateusz.K
-
-
