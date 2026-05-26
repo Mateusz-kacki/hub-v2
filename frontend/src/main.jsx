@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
 function App() {
-  const [grids, setGrids] = useState([]);
+const [aisles, setAisles] = useState([]);
 
   const [lp1File, setLp1File] = useState(null);
   const [lp2File, setLp2File] = useState(null);
@@ -17,7 +17,7 @@ function App() {
     const response = await fetch("http://127.0.0.1:8000/layout");
     const data = await response.json();
 
-    setGrids(data.grids || []);
+setAisles(data.aisles || []);
   }
 
   async function uploadDay() {
@@ -48,12 +48,13 @@ function App() {
     }
   }
 
-  function getTaskForRow(gridId, rowIndex) {
-    return tasks.find(
-      (task) =>
-        task.assigned_grid_id === gridId &&
-        task.assigned_row === rowIndex
-    );
+function getTaskForRow(aisleId, rowIndex) {
+  return tasks.find(
+    (task) =>
+      task.assigned_aisle_id === aisleId &&
+      task.assigned_row === rowIndex
+  );
+}
   }
   function getDockCount(dockNumber) {
   return tasks.filter(
@@ -151,6 +152,7 @@ function App() {
               let background = "#facc15";
             if (colIndex === 0) {
   background = "#d1d5db";
+            }
 
               if (task && !isTextColumn) {
                 if (colIndex >= grid.columns - 1 - task.black_quantity) {
