@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
 function App() {
-const [aisles, setAisles] = useState([]);
-
+  const [aisles, setAisles] = useState([]);
   const [lp1File, setLp1File] = useState(null);
   const [lp2File, setLp2File] = useState(null);
-
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
@@ -16,8 +14,7 @@ const [aisles, setAisles] = useState([]);
   async function loadLayout() {
     const response = await fetch("http://127.0.0.1:8000/layout");
     const data = await response.json();
-
-setAisles(data.aisles || []);
+    setAisles(data.aisles || []);
   }
 
   async function uploadDay() {
@@ -27,7 +24,6 @@ setAisles(data.aisles || []);
     }
 
     const formData = new FormData();
-
     formData.append("lp1", lp1File);
     formData.append("lp2", lp2File);
 
@@ -38,9 +34,7 @@ setAisles(data.aisles || []);
       });
 
       const data = await response.json();
-
       setTasks(data.tasks || []);
-
       console.log(data);
     } catch (error) {
       console.error(error);
@@ -48,19 +42,19 @@ setAisles(data.aisles || []);
     }
   }
 
-function getTaskForRow(aisleId, rowIndex) {
-  return tasks.find(
-    (task) =>
-      task.assigned_aisle_id === aisleId &&
-      task.assigned_row === rowIndex
-  );
-}
+  function getTaskForRow(aisleId, rowIndex) {
+    return tasks.find(
+      (task) =>
+        task.assigned_aisle_id === aisleId &&
+        task.assigned_row === rowIndex
+    );
   }
+
   function getDockCount(dockNumber) {
-  return tasks.filter(
-    (task) => task.assigned_dock === dockNumber
-  ).length;
-}
+    return tasks.filter(
+      (task) => task.assigned_dock === dockNumber
+    ).length;
+  }
 
   return (
     <div style={styles.app}>
@@ -85,12 +79,9 @@ function getTaskForRow(aisleId, rowIndex) {
           />
         </label>
 
-        <button onClick={uploadDay}>
-          Przelicz plan
-        </button>
-        <span>
-  Sklepy: {tasks.length}
-</span>
+        <button onClick={uploadDay}>Przelicz plan</button>
+
+        <span>Sklepy: {tasks.length}</span>
 
         <div style={styles.legend}>
           <div style={styles.legendItem}>
@@ -109,100 +100,216 @@ function getTaskForRow(aisleId, rowIndex) {
           </div>
         </div>
       </div>
+
       <div style={styles.dockStats}>
-  <div>DOK 16 → {getDockCount(16)}</div>
-  <div>DOK 17 → {getDockCount(17)}</div>
-  <div>DOK 18 → {getDockCount(18)}</div>
-</div>
+        <div>DOK 16 → {getDockCount(16)}</div>
+        <div>DOK 17 → {getDockCount(17)}</div>
+        <div>DOK 18 → {getDockCount(18)}</div>
+      </div>
 
       <div style={styles.canvas}>
-      {aisles
-  .filter((aisle) =>
-    tasks.some(
-      (task) =>
-        task.assigned_aisle_id === aisle.id
-    )
-  )
-  .map((aisle) => (
-        style={{
-  ...styles.aisle,
-  left: `${aisle.x}%`,
-  top: `${aisle.y}%`,
-  width: `${aisle.width}%`,
-  height: `${aisle.height}%`
-}}
-          > 
-            <div style={styles.dockLabel}>
-  DOK {grid.dock}
-</div>
-{[0, 1].map((rowIndex) => {
-  const task = getTaskForRow(
-    aisle.id,
-    rowIndex
-  );
-
-  const used =
-    task?.total_quantity || 0;
-
-  const black =
-    task?.black_quantity || 0;
-
-  const blue =
-    Math.max(0, used - black);
-
-  return (
-    <div
-      key={rowIndex}
-      style={styles.aisleRow}
-    >
-      <div style={styles.aisleId}>
-        {aisle.id}
-      </div>
-
-      <div style={styles.capacityBar}>
-        {Array.from({
-          length: 16
-        }).map((_, i) => {
-          let background = "#facc15";
-
-          if (i < blue) {
-            background = "#4aa3ff";
-          }
-
-          if (
-            i >= blue &&
-            i < blue + black
-          ) {
-            background = "#111827";
-          }
-
-          return (
+        {aisles
+          .filter((aisle) =>
+            tasks.some((task) => task.assigned_aisle_id === aisle.id)
+          )
+          .map((aisle) => (
             <div
-              key={i}
+              key={aisle.id}
               style={{
-                ...styles.unitCell,
-                background
+                ...styles.aisle,
+                left: `${aisle.x}%`,
+                top: `${aisle.y}%`,
+                width: `${aisle.width}%`,
+                height: `${aisle.height}%`
               }}
-            />
-          );
-        })}
-      </div>
+            >
+              <div style={styles.dockLabel}>
+                DOK {aisle.docks.join(" / ")}
+              </div>
 
-      <div style={styles.storeBox}>
-        {task ? (
-          <>
-            <div>
-              {task.store_number}
-            </div>
+              {[0, 1].map((rowIndex) => {
+                const task = getTaskForRow(aisle.id, rowIndex);
 
-            <div style={styles.timeRow}>
-              {task.arrival_time || "-"}
-              {" → "}
-              {task.departure_time || "-"}
+                const used = task?.total_quantity || 0;
+                const black = task?.black_quantity || 0;
+                const blue = Math.max(0, used - black);
+
+                return (
+                  <div key={rowIndex} style={styles.aisleRow}>
+                    <div style={styles.aisleId}>{aisle.id}</div>
+
+                    <div style={styles.capacityBar}>
+                      {Array.from({ length: 16 }).map((_, i) => {
+                        let background = "#facc15";
+
+                        if (i < blue) {
+                          background = "#4aa3ff";
+                        }
+
+                        if (i >= blue && i < blue + black) {
+                          background = "#111827";
+                        }
+
+                        return (
+                          <div
+                            key={i}
+                            style={{
+                              ...styles.unitCell,
+                              background
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+
+                    <div style={styles.storeBox}>
+                      {task ? (
+                        <>
+                          <div>{task.store_number}</div>
+
+                          <div style={styles.timeRow}>
+                            {task.arrival_time || "-"}
+                            {" → "}
+                            {task.departure_time || "-"}
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </>
-        ) : null}
+          ))}
       </div>
     </div>
   );
-})}
+}
+
+const styles = {
+  app: {
+    width: "100vw",
+    height: "100vh",
+    background: "#e5e5e5",
+    overflow: "hidden",
+    fontFamily: "Arial"
+  },
+
+  header: {
+    height: "60px",
+    background: "#1f2937",
+    color: "white",
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    padding: "0 16px",
+    fontSize: "16px"
+  },
+
+  legend: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    marginLeft: "20px"
+  },
+
+  legendItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    fontSize: "13px"
+  },
+
+  legendColor: {
+    width: "16px",
+    height: "16px",
+    border: "1px solid white"
+  },
+
+  dockStats: {
+    display: "flex",
+    gap: "12px",
+    padding: "6px 16px",
+    fontSize: "13px",
+    fontWeight: "bold",
+    background: "#f3f4f6"
+  },
+
+  canvas: {
+    position: "relative",
+    width: "100%",
+    height: "calc(100vh - 92px)",
+    background: "#ffffff",
+    overflow: "hidden"
+  },
+
+  aisle: {
+    position: "absolute",
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+    background: "#facc15",
+    border: "2px solid #111827",
+    boxSizing: "border-box",
+    padding: "2px"
+  },
+
+  dockLabel: {
+    position: "absolute",
+    top: "-22px",
+    left: "0",
+    fontSize: "13px",
+    fontWeight: "bold",
+    color: "#111827"
+  },
+
+  aisleRow: {
+    display: "grid",
+    gridTemplateColumns: "46px 1fr 90px",
+    height: "50%",
+    gap: "2px"
+  },
+
+  aisleId: {
+    background: "#d1d5db",
+    border: "1px solid #9ca3af",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "11px",
+    fontWeight: "bold"
+  },
+
+  capacityBar: {
+    display: "grid",
+    gridTemplateColumns: "repeat(16, 1fr)",
+    gap: "1px"
+  },
+
+  unitCell: {
+    border: "1px solid #9ca3af",
+    boxSizing: "border-box"
+  },
+
+  storeBox: {
+    background: "#ffffff",
+    border: "1px solid #9ca3af",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "11px",
+    fontWeight: "bold",
+    overflow: "hidden"
+  },
+
+  timeRow: {
+    fontSize: "9px",
+    fontWeight: "normal"
+  }
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
