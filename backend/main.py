@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from excel_routes import router as excel_router
-from layout import GRIDS
+from layout import AISLES
 
 app = FastAPI(title="Warehouse Planner API")
 
@@ -28,5 +28,5 @@ def root():
 @app.get("/layout")
 def get_layout():
     return {
-        "grids": GRIDS
+        "aisles": AISLES
     }
