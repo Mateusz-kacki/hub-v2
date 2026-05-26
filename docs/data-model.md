@@ -63,14 +63,20 @@ Alejka magazynowa.
 Alejka:
 - może obsługiwać wiele doków,
 - posiada limit pojemności,
-- posiada limit sklepów,
-- renderowana jest jako układ 2x16.
+- posiada limit sklepów.
+
+Planner korzysta wyłącznie z:
+- podłużnych żółtych alejek magazynowych.
+
+Każda alejka może obsłużyć:
+- maksymalnie 2 sklepy,
+- maksymalnie 16 jednostek na sklep.
 
 Struktura renderu:
 
 ```text
-| ID ALEJKI | 16 jednostek | sklep |
-| ID ALEJKI | 16 jednostek | sklep |
+| S16-8 | [########....] | sklep 1 |
+| S16-8 | [######......] | sklep 2 |
 ```
 
 Pola:
@@ -111,9 +117,8 @@ Przykład:
 # Capacity Rules
 
 Jedna alejka:
-- maksymalnie 16 jednostek na rząd,
 - maksymalnie 2 sklepy,
-- jeden sklep zajmuje jeden rząd.
+- maksymalnie 16 jednostek na sklep.
 
 Planner pilnuje:
 - capacityUnits,
@@ -212,7 +217,12 @@ Frontend renderuje:
 - obciążenie doków.
 
 Każda alejka renderowana jest jako:
-- 2 rzędy,
-- 16 jednostek,
-- kolumna ID alejki,
-- kolumna sklepu.
+
+```text
+| ID ALEJKI | wykorzystanie jednostek | sklep |
+| ID ALEJKI | wykorzystanie jednostek | sklep |
+```
+
+Czyli:
+- maksymalnie 2 sklepy,
+- maksymalnie 16 jednostek na sklep.
