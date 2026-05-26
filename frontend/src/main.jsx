@@ -116,184 +116,93 @@ function getTaskForRow(aisleId, rowIndex) {
 </div>
 
       <div style={styles.canvas}>
-        {grids
-  .filter((grid) =>
+      {aisles
+  .filter((aisle) =>
     tasks.some(
       (task) =>
-        task.assigned_grid_id === grid.id
+        task.assigned_aisle_id === aisle.id
     )
   )
-  .map((grid) => (
-          <div
-            key={grid.id}
-            style={{
-              ...styles.grid,
-              left: `${grid.x}%`,
-              top: `${grid.y}%`,
-              width: `${grid.width}%`,
-              height: `${grid.height}%`,
-              gridTemplateRows: `repeat(${grid.rows}, 1fr)`,
-              gridTemplateColumns: `repeat(${grid.columns}, 1fr)`
-            }}
+  .map((aisle) => (
+        style={{
+  ...styles.aisle,
+  left: `${aisle.x}%`,
+  top: `${aisle.y}%`,
+  width: `${aisle.width}%`,
+  height: `${aisle.height}%`
+}}
           > 
             <div style={styles.dockLabel}>
   DOK {grid.dock}
 </div>
-            {Array.from({
-              length: grid.rows * grid.columns
-            }).map((_, index) => {
-              const rowIndex = Math.floor(index / grid.columns);
-              const colIndex = index % grid.columns;
+{[0, 1].map((rowIndex) => {
+  const task = getTaskForRow(
+    aisle.id,
+    rowIndex
+  );
 
-              const task = getTaskForRow(grid.id, rowIndex);
+  const used =
+    task?.total_quantity || 0;
 
-              const isTextColumn = colIndex === grid.columns - 1;
+  const black =
+    task?.black_quantity || 0;
 
-              let background = "#facc15";
-            if (colIndex === 0) {
-  background = "#d1d5db";
-            }
+  const blue =
+    Math.max(0, used - black);
 
-              if (task && !isTextColumn) {
-                if (colIndex >= grid.columns - 1 - task.black_quantity) {
-                  background = "#111827";
-                } else if (colIndex >= grid.columns - 1 - task.total_quantity) {
-                  background = "#4aa3ff";
-                }
-              }
+  return (
+    <div
+      key={rowIndex}
+      style={styles.aisleRow}
+    >
+      <div style={styles.aisleId}>
+        {aisle.id}
+      </div>
 
-              return (
-                <div
-                  key={index}
-                  style={{
-                    ...styles.cell,
-                    background
-                  }}
-                >
-                  <>
-  {colIndex === 0 ? rowIndex + 1 : ""}
+      <div style={styles.capacityBar}>
+        {Array.from({
+          length: 16
+        }).map((_, i) => {
+          let background = "#facc15";
 
-{task && isTextColumn
- ? (
-  <div style={styles.storeInfo}>
-    <div>{task.store_number}</div>
+          if (i < blue) {
+            background = "#4aa3ff";
+          }
 
-    <div style={styles.timeRow}>
-      {task.arrival_time || "-"}
-      {" → "}
-      {task.departure_time || "-"}
-    </div>
-  </div>
-)
-  : ""}
-</>
-                </div>
-              );
-            })}
-          </div>
-        ))}
+          if (
+            i >= blue &&
+            i < blue + black
+          ) {
+            background = "#111827";
+          }
+
+          return (
+            <div
+              key={i}
+              style={{
+                ...styles.unitCell,
+                background
+              }}
+            />
+          );
+        })}
+      </div>
+
+      <div style={styles.storeBox}>
+        {task ? (
+          <>
+            <div>
+              {task.store_number}
+            </div>
+
+            <div style={styles.timeRow}>
+              {task.arrival_time || "-"}
+              {" → "}
+              {task.departure_time || "-"}
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   );
-}
-
-const styles = {
-  app: {
-    width: "100vw",
-    height: "100vh",
-    background: "#e5e5e5",
-    overflow: "hidden",
-    fontFamily: "Arial"
-  },
-
-  header: {
-    height: "60px",
-    background: "#1f2937",
-    color: "white",
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "0 16px",
-    fontSize: "16px"
-  },
-
-  legend: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    marginLeft: "20px"
-  },
-
-  legendItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    fontSize: "13px"
-  },
-
-  legendColor: {
-    width: "16px",
-    height: "16px",
-    border: "1px solid white"
-  },
-  dockStats: {
-  display: "flex",
-  gap: "12px",
-  marginLeft: "20px",
-  fontSize: "13px",
-  fontWeight: "bold"
-},
-
-  canvas: {
-    position: "relative",
-    width: "100%",
-    height: "calc(100vh - 60px)",
-    background: "#ffffff",
-    overflow: "hidden"
-  },
-
-  grid: {
-    position: "absolute",
-    display: "grid",
-    background: "#facc15",
-    border: "2px solid #111827",
-    boxSizing: "border-box"
-  },
-  dockLabel: {
-  position: "absolute",
-  top: "-22px",
-  left: "0",
-  fontSize: "13px",
-  fontWeight: "bold",
-  color: "#111827"
-},
-  storeInfo: {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  lineHeight: "1.1"
-},
-
-timeRow: {
-  fontSize: "9px",
-  fontWeight: "normal"
-},
-
-  cell: {
-    border: "1px solid #9ca3af",
-    boxSizing: "border-box",
-    fontSize: "11px",
-    fontWeight: "bold",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden"
-  }
-};
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+})}
