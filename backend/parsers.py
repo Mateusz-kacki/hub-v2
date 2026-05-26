@@ -9,7 +9,6 @@ def parse_lp2(df):
         total_quantity = safe_int(row, 9)
         black_quantity = safe_int(row, 7)
 
-        # pomijamy nagłówki / opisy / wiersze bez ilości
         if total_quantity <= 0:
             continue
 
