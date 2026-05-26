@@ -9,6 +9,7 @@ Layout odwzorowuje:
 - sektory magazynu.
 
 Frontend renderuje layout dynamicznie na podstawie:
+
 ```text
 backend/layout.py
 ```
@@ -28,6 +29,21 @@ DOK 15:
 
 ---
 
+# Priorytet doków
+
+Priorytet doków:
+
+```text
+16 → 17 → 18
+```
+
+Planner:
+1. najpierw próbuje DOK 16
+2. potem DOK 17
+3. potem DOK 18
+
+---
+
 # Alejki magazynowe
 
 Planner korzysta wyłącznie z:
@@ -41,7 +57,14 @@ Inne sektory magazynu:
 
 # Model alejki
 
-Każda alejka posiada:
+Każda alejka:
+- może obsługiwać wiele doków,
+- posiada limit pojemności,
+- posiada limit sklepów,
+- może obsłużyć maksymalnie 2 sklepy,
+- każdy sklep może zajmować maksymalnie 16 jednostek.
+
+Przykład modelu:
 
 ```python
 {
@@ -65,6 +88,21 @@ Każda alejka posiada:
 
 ---
 
+# Wizualizacja alejki
+
+Frontend renderuje alejkę jako dwa sloty sklepowe:
+
+```text
+| S16-8 | [########....] | sklep 1 |
+| S16-8 | [######......] | sklep 2 |
+```
+
+Czyli:
+- maksymalnie 2 sklepy,
+- maksymalnie 16 jednostek na sklep.
+
+---
+
 # Shared Aisles
 
 Niektóre alejki mogą być współdzielone między dokami.
@@ -84,26 +122,11 @@ Planner wybiera:
 
 ---
 
-# Priorytet doków
-
-Priorytet doków:
-
-```text
-16 → 17 → 18
-```
-
-Planner:
-1. najpierw próbuje DOK 16
-2. potem DOK 17
-3. potem DOK 18
-
----
-
 # Capacity Rules
 
 Jedna alejka:
-- maksymalnie 16 jednostek,
-- maksymalnie 2 sklepy.
+- maksymalnie 2 sklepy,
+- maksymalnie 16 jednostek na sklep.
 
 Planner pilnuje:
 - capacityUnits,
