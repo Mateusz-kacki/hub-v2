@@ -41,12 +41,30 @@ Planner:
 
 # Alejki magazynowe
 
+Planner korzysta wyłącznie z:
+- podłużnych żółtych alejek magazynowych.
+
 Każda alejka:
 - posiada maksymalną pojemność,
 - posiada limit sklepów,
 - może obsługiwać wiele doków.
 
-Przykład:
+---
+
+# Model alejki
+
+Każda alejka może obsłużyć:
+- maksymalnie 2 sklepy,
+- maksymalnie 16 jednostek na sklep.
+
+Przykład wizualny:
+
+```text
+| S16-8 | [########....] | sklep 1 |
+| S16-8 | [######......] | sklep 2 |
+```
+
+Przykład modelu:
 
 ```python
 {
@@ -65,8 +83,8 @@ Przykład:
 # Capacity Rules
 
 Jedna alejka:
-- maksymalnie 16 jednostek,
-- maksymalnie 2 sklepy.
+- maksymalnie 2 sklepy,
+- maksymalnie 16 jednostek na sklep.
 
 Planner pilnuje:
 - capacityUnits,
@@ -88,16 +106,19 @@ S16-8
 
 Planner wybiera:
 - najbliższy możliwy dok,
-- najmniej przeciążony dok.
+- najmniej przeciążony dok,
+- najlepszą dostępną alejkę.
 
 ---
 
 # Collision Prevention
 
 Planner:
-- unika zbyt wielu sklepów na jednym doku,
+- unika przeciążenia doków,
 - unika konfliktów godzin wydania,
-- balansuje obciążenie.
+- balansuje obciążenie magazynu,
+- pilnuje capacityUnits,
+- pilnuje maxStores.
 
 ---
 
@@ -123,6 +144,18 @@ Przypisanie sklepu
 
 ---
 
+# Store Slot Assignment
+
+Każda alejka posiada:
+- slot sklepu 1
+- slot sklepu 2
+
+Każdy sklep:
+- zajmuje dokładnie jeden slot,
+- może mieć maksymalnie 16 jednostek.
+
+---
+
 # Status sklepu
 
 Możliwe statusy:
@@ -136,7 +169,7 @@ Możliwe statusy:
 # Dynamic Release
 
 Po wydaniu sklepu:
-- alejka zostaje zwolniona,
+- slot alejki zostaje zwolniony,
 - capacity wraca,
 - planner może użyć alejki ponownie.
 
@@ -152,3 +185,10 @@ Frontend pokazuje:
 - quantity,
 - statusy,
 - obciążenie doków.
+
+Alejki renderowane są jako:
+
+```text
+| ID ALEJKI | wykorzystanie jednostek | sklep |
+| ID ALEJKI | wykorzystanie jednostek | sklep |
+```
