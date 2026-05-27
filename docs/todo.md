@@ -18,16 +18,14 @@
 - [x] widok planu magazynu
 - [x] upload LP1
 - [x] upload LP2
-- [x] render gridów
 - [x] render sklepów
 - [x] legenda kolorów
-- [x] numeracja wierszy
 - [x] statystyki doków
 - [x] statusy sklepów
-- [ ] przebudowa UI pod alejki liniowe
-- [ ] realistyczny layout magazynu
-- [ ] responsywność ekranu magazynowego
-- [ ] live refresh planu
+- [x] przebudowa UI pod alejki liniowe
+- [x] realistyczny layout magazynu
+- [x] responsywność ekranu magazynowego
+- [x] live refresh planu
 - [ ] panel błędów / alertów
 
 ---
@@ -42,13 +40,13 @@
 - [x] merge LP1 + LP2
 - [x] planner
 - [x] layout API
-- [ ] planner pojemności alejek
-- [ ] planner max 2 sklepy
-- [ ] planner priorytetów doków
-- [ ] planner współdzielonych alejek
-- [ ] walidacja danych Excel
-- [ ] logika realtime
-- [ ] logika wydanych sklepów
+- [x] planner pojemności alejek
+- [x] planner max 2 sklepy
+- [x] planner priorytetów doków
+- [x] planner współdzielonych alejek
+- [x] walidacja danych Excel
+- [x] logika realtime
+- [x] logika wydanych sklepów
 
 ---
 
@@ -57,26 +55,26 @@
 - [x] podstawowe gridy
 - [x] automatyczne rozmieszczanie
 - [x] podstawowe unikanie kolizji
-- [ ] model alejek liniowych
-- [ ] capacity_units = 16
-- [ ] max_stores = 2
-- [ ] przypisanie wielu doków do alejki
-- [ ] dock priority 16 → 17 → 18
-- [ ] realistyczne sektory magazynu
-- [ ] logika sąsiednich doków
-- [ ] balansowanie obciążenia doków
-- [ ] dynamiczne zwalnianie alejek
+- [x] model alejek liniowych
+- [x] capacity_units = 16
+- [x] max_stores = 2
+- [x] przypisanie wielu doków do alejki
+- [x] dock priority 16 → 17 → 18
+- [x] realistyczne sektory magazynu
+- [x] logika sąsiednich doków
+- [x] balansowanie obciążenia doków
+- [x] dynamiczne zwalnianie alejek
 - [ ] obsługa ręcznych zmian operatora
 
 ---
 
 ## Etap 5 — deployment i testy
-- [ ] deployment frontend
-- [ ] deployment backend
+- [x] deployment frontend
+- [x] deployment backend
 - [ ] podpięcie GitHub auto deploy
-- [ ] pierwsze testy LP1/LP2
-- [ ] testy magazynowe
-- [ ] poprawki parserów
-- [ ] poprawki UI
+- [x] pierwsze testy LP1/LP2
+- [x] testy magazynowe
+- [x] poprawki parserów
+- [x] poprawki UI
 - [ ] optymalizacja planera
-- [ ] przygotowanie demo
+- [x] przygotowanie demo
