@@ -5,9 +5,10 @@
 Stały układ magazynu.
 
 Zawiera:
-- background planu magazynu
-- lista doków
-- lista alejek magazynowych
+- background planu magazynu,
+- lista doków,
+- lista alejek magazynowych,
+- realistyczne pozycjonowanie alejek.
 
 Przykład:
 
@@ -63,7 +64,8 @@ Alejka magazynowa.
 Alejka:
 - może obsługiwać wiele doków,
 - posiada limit pojemności,
-- posiada limit sklepów.
+- posiada limit sklepów,
+- posiada realistyczną pozycję na overlayu magazynu.
 
 Planner korzysta wyłącznie z:
 - podłużnych żółtych alejek magazynowych.
@@ -122,7 +124,15 @@ Jedna alejka:
 
 Planner pilnuje:
 - capacityUnits,
-- maxStores.
+- maxStores,
+- overflow_units.
+
+Overflow:
+
+```text
+17 jednostek → +1
+18 jednostek → +2
+```
 
 ---
 
@@ -138,6 +148,11 @@ S16-8
 → DOK 17
 ```
 
+Planner wybiera:
+- najlepszy możliwy dok,
+- najmniej przeciążony dok,
+- najbliższą dostępną alejkę.
+
 ---
 
 ## StoreTask
@@ -152,6 +167,7 @@ Pola:
 - totalQuantity
 - blackQuantity
 - blueQuantity
+- overflowUnits
 - assignedDock
 - assignedAisleId
 - assignedRow
@@ -168,9 +184,11 @@ Przykład:
 
   "lp": "LP2",
 
-  "totalQuantity": 10,
+  "totalQuantity": 18,
   "blackQuantity": 2,
-  "blueQuantity": 8,
+  "blueQuantity": 16,
+
+  "overflowUnits": 2,
 
   "assignedDock": 16,
 
@@ -194,6 +212,26 @@ Możliwe statusy:
 
 ---
 
+## Time Visibility Rules
+
+Sklep pojawia się:
+
+```text
+1 godzina przed arrival_time
+```
+
+Sklep znika:
+
+```text
+po departure_time
+```
+
+Planner:
+- dynamicznie zwalnia alejki,
+- dynamicznie aktualizuje widoczność sklepów.
+
+---
+
 # Planner
 
 Planner:
@@ -203,7 +241,9 @@ Planner:
 - pilnuje maxStores,
 - unika przeciążenia doków,
 - balansuje ruch,
-- obsługuje współdzielone alejki.
+- obsługuje współdzielone alejki,
+- obsługuje route grouping,
+- pilnuje konfliktów czasowych między LP.
 
 ---
 
@@ -213,8 +253,10 @@ Frontend renderuje:
 - alejki magazynowe,
 - sklepy,
 - quantity,
+- overflow,
 - statusy,
-- obciążenie doków.
+- obciążenie doków,
+- realistyczny overlay magazynu.
 
 Każda alejka renderowana jest jako:
 
