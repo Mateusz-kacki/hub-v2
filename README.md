@@ -1,10 +1,20 @@
+# Warehouse Planner
+
+System wspomagający planowanie magazynu HUB Lublin.
+
 Projekt umożliwia:
 - upload LP1 i LP2,
 - automatyczne planowanie sklepów,
 - przydział doków,
 - przydział alejek,
 - wizualizację planu magazynu,
-- monitorowanie obciążenia doków.
+- monitorowanie obciążenia doków,
+- realistyczny overlay magazynu,
+- responsywny layout magazynowy,
+- dynamiczne pojawianie i znikanie sklepów,
+- grupowanie sklepów według tras LP,
+- planner współdzielonych alejek,
+- automatyczne odświeżanie planu.
 
 ---
 
@@ -86,6 +96,11 @@ Alejka:
 - posiada maksymalnie 2 sklepy,
 - każdy sklep może zajmować maksymalnie 16 jednostek.
 
+Dodatkowo:
+- alejki są pozycjonowane względem rzeczywistego layoutu magazynu,
+- planner obsługuje współdzielone alejki między dokami,
+- planner obsługuje overflow powyżej 16 jednostek.
+
 Przykład wizualny:
 
 ```text
@@ -125,6 +140,14 @@ Planner pilnuje:
 - poprawnego przypisania doków,
 - priorytetów doków 16 → 17 → 18.
 
+Planner dodatkowo:
+- sklepy z tej samej trasy LP mogą współdzielić alejkę,
+- różne trasy LP nie mogą współdzielić alejki przy konflikcie czasowym,
+- planner uwzględnia okna czasowe arrival/departure,
+- sklepy pojawiają się godzinę przed przyjazdem,
+- sklepy znikają po godzinie wydania,
+- planner dynamicznie zwalnia alejki.
+
 ---
 
 # Frontend
@@ -137,6 +160,12 @@ Frontend wyświetla:
 - quantity,
 - obciążenie doków,
 - legendę kolorów.
+
+Frontend obsługuje:
+- responsive warehouse overlay,
+- automatyczne skalowanie layoutu,
+- realistyczny plan magazynu,
+- live refresh planu.
 
 Kolory:
 - niebieski → standard
@@ -155,6 +184,7 @@ Backend udostępnia:
 - planner API
 
 Dokumentacja:
+
 ```text
 docs/api.md
 ```
@@ -174,19 +204,27 @@ DONE:
 - layout API
 - dock planner
 - merge LP1 + LP2
+- responsive warehouse overlay
+- realistyczny layout magazynu
+- planner współdzielonych alejek
+- overflow planner
+- dynamiczne zwalnianie alejek
+- live visibility sklepów
+- route grouping planner
 
 IN PROGRESS:
-- planner alejek liniowych
-- realistyczny layout magazynu
-- hosting online
-- testy magazynowe
+- edge-case planner logic
+- single-store pairing
+- deployment online
+- testy magazynowe realtime
 
 TODO:
-- deployment
 - PostgreSQL
-- live updates
-- alerty
-- realtime planner
+- alerty operatora
+- panel błędów
+- ręczne zmiany operatora
+- optymalizacja planera
+- monitoring realtime
 
 ---
 
@@ -214,4 +252,4 @@ Backend:
 
 # Autor
 
-Mateusz.K
+Mateusz K.
