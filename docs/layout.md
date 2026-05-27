@@ -6,7 +6,8 @@ Layout odwzorowuje:
 - rzeczywisty układ magazynu,
 - doki dystrybucyjne,
 - alejki magazynowe,
-- sektory magazynu.
+- sektory magazynu,
+- rzeczywiste pozycje alejek względem planu magazynu.
 
 Frontend renderuje layout dynamicznie na podstawie:
 
@@ -62,7 +63,8 @@ Każda alejka:
 - posiada limit pojemności,
 - posiada limit sklepów,
 - może obsłużyć maksymalnie 2 sklepy,
-- każdy sklep może zajmować maksymalnie 16 jednostek.
+- każdy sklep może zajmować maksymalnie 16 jednostek,
+- może obsługiwać overflow.
 
 Przykład modelu:
 
@@ -101,6 +103,13 @@ Czyli:
 - maksymalnie 2 sklepy,
 - maksymalnie 16 jednostek na sklep.
 
+Overflow:
+
+```text
+17 jednostek → +1
+18 jednostek → +2
+```
+
 ---
 
 # Shared Aisles
@@ -130,7 +139,9 @@ Jedna alejka:
 
 Planner pilnuje:
 - capacityUnits,
-- maxStores.
+- maxStores,
+- konfliktów czasowych,
+- konfliktów tras LP.
 
 ---
 
@@ -140,14 +151,21 @@ Frontend renderuje:
 - alejki,
 - sklepy,
 - quantity,
+- overflow,
 - statusy,
-- obciążenie doków.
+- obciążenie doków,
+- realistyczny overlay magazynu.
 
 Pozycjonowanie opiera się o:
 - x
 - y
 - width
 - height
+
+Overlay:
+- automatycznie skaluje się do ekranu,
+- zachowuje proporcje magazynu,
+- wspiera responsive layout.
 
 ---
 
@@ -156,7 +174,8 @@ Pozycjonowanie opiera się o:
 Layout jest:
 - dynamiczny,
 - renderowany z API,
-- możliwy do edycji bez zmian frontendowych.
+- możliwy do edycji bez zmian frontendowych,
+- automatycznie odświeżany.
 
 Frontend pobiera layout z:
 
@@ -166,11 +185,25 @@ GET /layout
 
 ---
 
+# Live Visibility
+
+Sklepy:
+- pojawiają się godzinę przed arrival_time,
+- znikają po departure_time.
+
+Planner:
+- dynamicznie zwalnia alejki,
+- dynamicznie aktualizuje widoczność sklepów.
+
+---
+
 # Future Improvements
 
 Planowane:
 - realistyczne odwzorowanie całego magazynu,
 - zoom layoutu,
-- live updates,
 - drag & drop sklepów,
-- ręczne korekty operatora.
+- ręczne korekty operatora,
+- alerty przeciążenia,
+- monitoring realtime,
+- operator dashboard.
