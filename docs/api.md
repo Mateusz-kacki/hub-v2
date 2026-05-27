@@ -26,7 +26,8 @@ Zwraca layout magazynu:
 - przypisane doki,
 - pozycje frontendowe,
 - capacity,
-- limity sklepów.
+- limity sklepów,
+- realistyczne pozycjonowanie overlayu.
 
 ### Response
 
@@ -62,6 +63,11 @@ Zwraca layout magazynu:
 
 Upload pliku LP1 (przyjazdy / wahadła).
 
+System:
+- parsuje arrival_time,
+- przypisuje sklepy do dostaw,
+- przygotowuje dane dla planner'a.
+
 ### Response
 
 ```json
@@ -89,6 +95,13 @@ Upload pliku LP1 (przyjazdy / wahadła).
 ### Description
 
 Upload pliku LP2 (wydania sklepów).
+
+System:
+- parsuje departure_time,
+- parsuje quantity,
+- parsuje LP / trasę,
+- obsługuje scalone komórki,
+- obsługuje dziedziczenie LP i departure_time.
 
 ### Response
 
@@ -128,10 +141,13 @@ Upload LP1 i LP2 jednocześnie.
 
 System:
 - łączy dane,
+- filtruje aktywne sklepy,
 - przydziela doki,
 - przydziela alejki,
 - sprawdza capacity,
 - sprawdza maxStores,
+- sprawdza konflikty LP,
+- sprawdza konflikty czasowe,
 - przypisuje slot sklepu.
 
 ### Response
@@ -154,11 +170,13 @@ System:
 
       "lp": "LP2",
 
-      "totalQuantity": 10,
+      "totalQuantity": 18,
 
       "blackQuantity": 2,
 
-      "blueQuantity": 8,
+      "blueQuantity": 16,
+
+      "overflowUnits": 2,
 
       "assignedDock": 16,
 
@@ -174,21 +192,49 @@ System:
 
 ---
 
+# Time Visibility Rules
+
+Sklep pojawia się:
+
+```text
+1 godzina przed arrival_time
+```
+
+Sklep znika:
+
+```text
+po departure_time
+```
+
+Planner:
+- dynamicznie aktualizuje widoczność sklepów,
+- dynamicznie zwalnia alejki.
+
+---
+
 # Store Slot Model
 
 Każda alejka posiada:
-- slot sklepu 1
-- slot sklepu 2
+- slot sklepu 1,
+- slot sklepu 2.
 
 Każdy sklep:
 - zajmuje jeden slot,
-- może mieć maksymalnie 16 jednostek.
+- może mieć maksymalnie 16 jednostek,
+- może generować overflow.
 
 Przykład renderu:
 
 ```text
 | S16-8 | [########....] | sklep 1 |
 | S16-8 | [######......] | sklep 2 |
+```
+
+Overflow:
+
+```text
+17 jednostek → +1
+18 jednostek → +2
 ```
 
 ---
