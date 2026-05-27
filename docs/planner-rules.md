@@ -7,7 +7,8 @@ System automatycznie:
 - przydziela sklepy do alejek,
 - balansuje obciążenie magazynu,
 - unika kolizji czasowych,
-- optymalizuje wykorzystanie przestrzeni.
+- optymalizuje wykorzystanie przestrzeni,
+- dynamicznie zwalnia alejki po wydaniu.
 
 ---
 
@@ -47,7 +48,8 @@ Planner korzysta wyłącznie z:
 Każda alejka:
 - posiada maksymalną pojemność,
 - posiada limit sklepów,
-- może obsługiwać wiele doków.
+- może obsługiwać wiele doków,
+- jest pozycjonowana względem rzeczywistego layoutu magazynu.
 
 ---
 
@@ -88,7 +90,8 @@ Jedna alejka:
 
 Planner pilnuje:
 - capacityUnits,
-- maxStores.
+- maxStores,
+- overflow powyżej 16 jednostek.
 
 ---
 
@@ -111,6 +114,18 @@ Planner wybiera:
 
 ---
 
+# Route Grouping
+
+Sklepy z tej samej trasy LP:
+- mogą współdzielić alejkę,
+- mogą zajmować oba sloty alejki.
+
+Różne trasy LP:
+- nie mogą współdzielić alejki,
+- jeśli występuje konflikt czasowy.
+
+---
+
 # Collision Prevention
 
 Planner:
@@ -118,7 +133,8 @@ Planner:
 - unika konfliktów godzin wydania,
 - balansuje obciążenie magazynu,
 - pilnuje capacityUnits,
-- pilnuje maxStores.
+- pilnuje maxStores,
+- pilnuje konfliktów czasowych między trasami LP.
 
 ---
 
@@ -131,6 +147,8 @@ LP1 + LP2
 ↓
 Merge danych
 ↓
+Filtrowanie czasu
+↓
 Przydział doku
 ↓
 Wybór alejki
@@ -139,8 +157,28 @@ Sprawdzenie capacity
 ↓
 Sprawdzenie maxStores
 ↓
+Sprawdzenie konfliktów LP
+↓
 Przypisanie sklepu
 ```
+
+---
+
+# Store Visibility
+
+Sklep pojawia się:
+```text
+1 godzina przed arrival_time
+```
+
+Sklep znika:
+```text
+po departure_time
+```
+
+Planner:
+- dynamicznie odświeża widoczność sklepów,
+- dynamicznie zwalnia alejki.
 
 ---
 
@@ -152,7 +190,14 @@ Każda alejka posiada:
 
 Każdy sklep:
 - zajmuje dokładnie jeden slot,
-- może mieć maksymalnie 16 jednostek.
+- może mieć maksymalnie 16 jednostek,
+- może generować overflow.
+
+Overflow:
+```text
+17 jednostek → +1
+18 jednostek → +2
+```
 
 ---
 
@@ -184,7 +229,8 @@ Frontend pokazuje:
 - sklepy,
 - quantity,
 - statusy,
-- obciążenie doków.
+- obciążenie doków,
+- overlay rzeczywistego layoutu magazynu.
 
 Alejki renderowane są jako:
 
