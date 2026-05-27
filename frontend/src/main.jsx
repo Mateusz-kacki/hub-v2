@@ -10,9 +10,18 @@ function App() {
   useEffect(() => {
     loadLayout();
   }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lp1File && lp2File) {
+        uploadDay();
+      }
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [lp1File, lp2File]);
 
   async function loadLayout() {
-    const response = await fetch("http://127.0.0.1:8000/layout");
+    const response = await fetch("/layout");
     const data = await response.json();
     setAisles(data.aisles || []);
   }
@@ -28,9 +37,9 @@ function App() {
     formData.append("lp2", lp2File);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/upload/day", {
+      const response = await fetch("/upload/day", {
         method: "POST",
-        body: formData
+        body: formData,
       });
 
       const data = await response.json();
@@ -45,15 +54,12 @@ function App() {
   function getTaskForRow(aisleId, rowIndex) {
     return tasks.find(
       (task) =>
-        task.assigned_aisle_id === aisleId &&
-        task.assigned_row === rowIndex
+        task.assigned_aisle_id === aisleId && task.assigned_row === rowIndex,
     );
   }
 
   function getDockCount(dockNumber) {
-    return tasks.filter(
-      (task) => task.assigned_dock === dockNumber
-    ).length;
+    return tasks.filter((task) => task.assigned_dock === dockNumber).length;
   }
 
   return (
@@ -85,17 +91,32 @@ function App() {
 
         <div style={styles.legend}>
           <div style={styles.legendItem}>
-            <div style={{ ...styles.legendColor, background: "#4aa3ff" }} />
+            <div
+              style={{
+                ...styles.legendColor,
+                background: "#4aa3ff",
+              }}
+            />
             Standard
           </div>
 
           <div style={styles.legendItem}>
-            <div style={{ ...styles.legendColor, background: "#111827" }} />
+            <div
+              style={{
+                ...styles.legendColor,
+                background: "#111827",
+              }}
+            />
             Dolly / Black
           </div>
 
           <div style={styles.legendItem}>
-            <div style={{ ...styles.legendColor, background: "#facc15" }} />
+            <div
+              style={{
+                ...styles.legendColor,
+                background: "#facc15",
+              }}
+            />
             Wolne
           </div>
         </div>
@@ -108,11 +129,14 @@ function App() {
       </div>
 
       <div style={styles.canvas}>
-        {aisles
-          .filter((aisle) =>
-            tasks.some((task) => task.assigned_aisle_id === aisle.id)
-          )
-          .map((aisle) => (
+        <div style={styles.layoutStage}>
+          <img
+            src="/warehouse-layout.PNG"
+            style={styles.layoutImage}
+            alt="Warehouse layout"
+          />
+
+          {aisles.map((aisle) => (
             <div
               key={aisle.id}
               style={{
@@ -120,18 +144,16 @@ function App() {
                 left: `${aisle.x}%`,
                 top: `${aisle.y}%`,
                 width: `${aisle.width}%`,
-                height: `${aisle.height}%`
+                height: `${aisle.height}%`,
               }}
             >
-              <div style={styles.dockLabel}>
-                DOK {aisle.docks.join(" / ")}
-              </div>
-
               {[0, 1].map((rowIndex) => {
                 const task = getTaskForRow(aisle.id, rowIndex);
 
                 const used = task?.total_quantity || 0;
+
                 const black = task?.black_quantity || 0;
+
                 const blue = Math.max(0, used - black);
 
                 return (
@@ -139,7 +161,9 @@ function App() {
                     <div style={styles.aisleId}>{aisle.id}</div>
 
                     <div style={styles.capacityBar}>
-                      {Array.from({ length: 16 }).map((_, i) => {
+                      {Array.from({
+                        length: 16,
+                      }).map((_, i) => {
                         let background = "#facc15";
 
                         if (i < blue) {
@@ -155,7 +179,7 @@ function App() {
                             key={i}
                             style={{
                               ...styles.unitCell,
-                              background
+                              background,
                             }}
                           />
                         );
@@ -165,12 +189,11 @@ function App() {
                     <div style={styles.storeBox}>
                       {task ? (
                         <>
-                          <div>{task.store_number}</div>
-
-                          <div style={styles.timeRow}>
-                            {task.arrival_time || "-"}
-                            {" → "}
-                            {task.departure_time || "-"}
+                          <div>
+                            {task.store_number}
+                            {task.overflow_units > 0
+                              ? ` +${task.overflow_units}`
+                              : ""}
                           </div>
                         </>
                       ) : null}
@@ -180,6 +203,7 @@ function App() {
               })}
             </div>
           ))}
+        </div>
       </div>
     </div>
   );
@@ -191,7 +215,7 @@ const styles = {
     height: "100vh",
     background: "#e5e5e5",
     overflow: "hidden",
-    fontFamily: "Arial"
+    fontFamily: "Arial",
   },
 
   header: {
@@ -202,27 +226,27 @@ const styles = {
     alignItems: "center",
     gap: "12px",
     padding: "0 16px",
-    fontSize: "16px"
+    fontSize: "16px",
   },
 
   legend: {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    marginLeft: "20px"
+    marginLeft: "20px",
   },
 
   legendItem: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    fontSize: "13px"
+    fontSize: "13px",
   },
 
   legendColor: {
     width: "16px",
     height: "16px",
-    border: "1px solid white"
+    border: "1px solid white",
   },
 
   dockStats: {
@@ -231,15 +255,34 @@ const styles = {
     padding: "6px 16px",
     fontSize: "13px",
     fontWeight: "bold",
-    background: "#f3f4f6"
+    background: "#f3f4f6",
   },
 
   canvas: {
     position: "relative",
     width: "100%",
     height: "calc(100vh - 92px)",
-    background: "#ffffff",
-    overflow: "hidden"
+    overflow: "auto",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+  },
+
+  layoutStage: {
+    position: "relative",
+    width: "1400px",
+    height: "900px",
+    margin: "0 auto",
+  },
+
+  layoutImage: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+    zIndex: 1,
   },
 
   aisle: {
@@ -250,23 +293,15 @@ const styles = {
     background: "#facc15",
     border: "2px solid #111827",
     boxSizing: "border-box",
-    padding: "2px"
-  },
-
-  dockLabel: {
-    position: "absolute",
-    top: "-22px",
-    left: "0",
-    fontSize: "13px",
-    fontWeight: "bold",
-    color: "#111827"
+    padding: "2px",
+    zIndex: 2,
   },
 
   aisleRow: {
     display: "grid",
-    gridTemplateColumns: "46px 1fr 90px",
+    gridTemplateColumns: "33px 1fr 42px",
     height: "50%",
-    gap: "2px"
+    gap: "2px",
   },
 
   aisleId: {
@@ -275,19 +310,19 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "11px",
-    fontWeight: "bold"
+    fontSize: "9px",
+    fontWeight: "bold",
   },
 
   capacityBar: {
     display: "grid",
     gridTemplateColumns: "repeat(16, 1fr)",
-    gap: "1px"
+    gap: "1px",
   },
 
   unitCell: {
     border: "1px solid #9ca3af",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   },
 
   storeBox: {
@@ -297,19 +332,19 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "11px",
+    fontSize: "8px",
     fontWeight: "bold",
-    overflow: "hidden"
+    overflow: "hidden",
   },
 
   timeRow: {
     fontSize: "9px",
-    fontWeight: "normal"
-  }
+    fontWeight: "normal",
+  },
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
